@@ -176,20 +176,14 @@ public class MainActivity extends AppCompatActivity implements DateV.OnClickItem
     private void displayTiem(View viewDialog) {
         dialog = new Dialog(this, R.style.Dialog2);
         Window dialogWindow = dialog.getWindow();
-        /*实例化Window*/
         WindowManager.LayoutParams lp = dialogWindow.getAttributes();
 
         Display display = this.getWindowManager().getDefaultDisplay();
         int width = display.getWidth();
         int height = display.getHeight();
-//         /*实例化Window操作者*/
-//        lp.x = 0; // 新位置X坐标
-//        lp.y = height - viewDialog.getHeight(); // 新位置Y坐标
-//        dialogWindow.setAttributes(lp);
 
         dialogWindow.setGravity(Gravity.BOTTOM);
         dialogWindow.setWindowAnimations(R.style.mystyle);
-        //设置dialog的宽高为屏幕的宽高
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.setContentView(viewDialog, layoutParams);
         dialog.show();
@@ -224,13 +218,13 @@ public class MainActivity extends AppCompatActivity implements DateV.OnClickItem
                     intent.putExtra("time", dataTime + birthday);
                     setResult(RESULT_TIME_CODE, intent);
 //                    ToastUtil.showMessage(dataTime + birthday);
-                    finish();
+//                    finish();
                 } else {
 //                    ToastUtil.showMessage(dataTime + hs[3] + "点" + ms[0] + "分");
                     Intent intent = new Intent();
                     intent.putExtra("time", dataTime + hs[3] + "点" + ms[0] + "分");
                     setResult(RESULT_TIME_CODE, intent);
-                    finish();
+//                    finish();
                 }
                 dialog.dismiss();
             }
@@ -245,8 +239,6 @@ public class MainActivity extends AppCompatActivity implements DateV.OnClickItem
     private void getDataPick(View view) {
         Calendar c = Calendar.getInstance();
         int norYear = c.get(Calendar.YEAR);
-//		int curMonth = c.get(Calendar.MONTH) + 1;//通过Calendar算出的月数要+1
-//		int curDate = c.get(Calendar.DATE);
 
         int curYear = mYear;
         int curMonth = mMonth;

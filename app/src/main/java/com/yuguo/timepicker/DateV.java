@@ -10,11 +10,14 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.lang.annotation.Target;
 import java.util.Calendar;
 
 public class DateV extends View {
 
     int COL = 7, ROW = 6;
+    int defaultMonthDays;//今天所在月的天数
+    private boolean isFirstEnter = true;
     int currentMonthDays;//当前月的天数
     int year, month, day;// 年月日
     int widthSize, heightSize;//单元格的宽高
@@ -60,6 +63,10 @@ public class DateV extends View {
         // TODO Auto-generated method stub
         super.onDraw(canvas);
         initSize();
+        if (isFirstEnter) {
+            isFirstEnter = false;
+            defaultMonthDays = getCurrentMonthDays(year, month);
+        }
         currentMonthDays = getCurrentMonthDays(year, month);
         firstweek = getFirstWeek(year, month);
         int middistanceDays = distanceDays;//中间值
@@ -92,8 +99,25 @@ public class DateV extends View {
                 if (year < Calendar.getInstance().get(Calendar.YEAR)) { //去年的
                     mTextPaint.setColor(Color.GRAY);
                 } else if (year == Calendar.getInstance().get(Calendar.YEAR)) {
-                    if ((month < Calendar.getInstance().get(Calendar.MONTH)) || (month == Calendar.getInstance().get(Calendar.MONTH) && i < (day - 1))) {
+                    if ((month < Calendar.getInstance().get(Calendar.MONTH)) || (month == Calendar.getInstance().get(Calendar.MONTH) && (i < (day - 1) || i > (day + 6)))
+                            || ((month - Calendar.getInstance().get(Calendar.MONTH)) == 1 && (i > ((7 - (defaultMonthDays - day)) > 0 ? (7 - (defaultMonthDays - day) - 1) :
+                            -1))) || (month - Calendar.getInstance().get(Calendar.MONTH) > 1)) {
                         mTextPaint.setColor(Color.GRAY);
+                    }
+                } else  if (year > Calendar.getInstance().get(Calendar.YEAR)) {
+                    if (year - Calendar.getInstance().get(Calendar.YEAR) > 1) {
+                        mTextPaint.setColor(Color.GRAY);
+
+                    } else {
+                        if (month == 0 && Calendar.getInstance().get(Calendar.MONTH) == 11) {
+                            if (i > ((7 - (defaultMonthDays - day)) > 0 ? (7 - (defaultMonthDays - day) - 1) : -1)) {
+                                mTextPaint.setColor(Color.GRAY);
+
+                            }
+                        } else {
+                            mTextPaint.setColor(Color.GRAY);
+
+                        }
                     }
                 } else {
                     mTextPaint.setColor(Color.BLACK);
@@ -196,51 +220,92 @@ public class DateV extends View {
         // TODO Auto-generated method stub
         int x = (int) event.getX();
         int y = (int) event.getY();
+        Log.e("heheh", month + "");
+        Log.e("hehe", currentMonthDays + ";" + day);
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (onClickItemListener != null) {
                     if (getClickDay(x, y) != -1) {
                         clickDay = getClickDay(x, y);
+                        Log.e("heheh", clickDay + "");
 //                        int i = Calendar.getInstance().get(Calendar.MONTH);
-                        if (year > Calendar.getInstance().get(Calendar.YEAR) && Calendar.getInstance().get(Calendar.MONTH) != 11) {
-                            onClickItemListener.onClickItem(getClickDay(x, y));
-                            isClickToday = false;
-                            invalidate();
-                            return true;
+                        if (year > Calendar.getInstance().get(Calendar.YEAR)) {
+                            if (year - Calendar.getInstance().get(Calendar.YEAR) > 1) {
+
+                            } else {
+                                if (month == 0 && Calendar.getInstance().get(Calendar.MONTH) == 11) {
+                                    if (clickDay > ((7 - (defaultMonthDays - day)) > 0 ? (7 - (defaultMonthDays - day)) : 0)) {
+                                    } else {
+                                        onClickItemListener.onClickItem(getClickDay(x, y));
+                                        isClickToday = false;
+                                        invalidate();
+                                        return true;
+                                    }
+                                } else {
+
+                                }
+                            }
                         }
                         if (distanceDays >= twoweek) {//本月
                             if ((year == Calendar.getInstance().get(Calendar.YEAR) && month == Calendar.getInstance().get(Calendar.MONTH))) {
-                                if (clickDay > (twoweek + day - 1)) {
+                                if (clickDay > (twoweek + day - 1) && clickDay < twoweek + day - 1 + 8) {
                                     onClickItemListener.onClickItem(getClickDay(x, y));
                                     isClickToday = false;
                                     invalidate();
                                     return true;
                                 }
-                            } else if ((year == Calendar.getInstance().get(Calendar.YEAR) && month > Calendar.getInstance().get(Calendar.MONTH))
-                                    || (year > Calendar.getInstance().get(Calendar.YEAR))) {
-                                if (clickDay >= 1) {
+                            } else if ((year == Calendar.getInstance().get(Calendar.YEAR) && month - Calendar.getInstance().get(Calendar.MONTH) == 1)) {
+                                if ((clickDay > ((7 - (defaultMonthDays - day)) > 0 ? (7 - (defaultMonthDays - day)) : 0))) {
+
+                                } else {
                                     onClickItemListener.onClickItem(getClickDay(x, y));
                                     isClickToday = false;
                                     invalidate();
                                     return true;
+                                }
+                            } else if (year > Calendar.getInstance().get(Calendar.YEAR)) {
+
+                                if (year - Calendar.getInstance().get(Calendar.YEAR) > 1) {
+
+                                } else {
+                                    if (month == 0 && Calendar.getInstance().get(Calendar.MONTH) == 11) {
+                                        if (clickDay > ((7 - (defaultMonthDays - day)) > 0 ? (7 - (defaultMonthDays - day)) : 0)) {
+                                        } else {
+                                            onClickItemListener.onClickItem(getClickDay(x, y));
+                                            isClickToday = false;
+                                            invalidate();
+                                            return true;
+                                        }
+                                    } else {
+
+                                    }
                                 }
                             }
                         } else if (Calendar.getInstance().get(Calendar.MONTH) != 11) {
                             if ((year == Calendar.getInstance().get(Calendar.YEAR) && month == Calendar.getInstance().get(Calendar.MONTH) + 1)) {
-                                if (clickDay > (twoweek - distanceDays)) {
+
+                                if ((clickDay > ((7 - (defaultMonthDays - day)) > 0 ? (7 - (defaultMonthDays - day)) : 0))) {
+
+                                } else {
                                     onClickItemListener.onClickItem(getClickDay(x, y));
-                                    invalidate();
                                     isClickToday = false;
+                                    invalidate();
                                     return true;
                                 }
+
                             }
                         } else {
                             if (year == Calendar.getInstance().get(Calendar.YEAR) + 1 && month == 0) {
-                                if (clickDay > (twoweek - distanceDays)) {
-                                    onClickItemListener.onClickItem(getClickDay(x, y));
-                                    invalidate();
-                                    isClickToday = false;
-                                    return true;
+
+                                if (month == 0 && Calendar.getInstance().get(Calendar.MONTH) == 11) {
+                                    if (clickDay > ((7 - (defaultMonthDays - day)) > 0 ? (7 - (defaultMonthDays - day)) : 0)) {
+                                    } else {
+                                        onClickItemListener.onClickItem(getClickDay(x, y));
+                                        isClickToday = false;
+                                        invalidate();
+                                        return true;
+                                    }
                                 }
                             }
                         }
